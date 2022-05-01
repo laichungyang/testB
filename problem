@@ -1,0 +1,17 @@
+情境：因為外部服務 API Key 用量有限制，每個 API Key 每秒只能發送 3 個請求。
+
+需求：我們系統（A 系統）每秒需發送至少 30 個請求，請設計另一個系統（B 系統），能夠輪流使用至少 10 個 API Key，讓 A 系統避開外部服務 API Key Rate Limit 限制。
+
+備註：請著重系統設計，配合使用 Laravel 諸如 Queue、Scheduler 等功能使用，程式碼可以寫個大概不用實際執行，我們會著重討論架構及 Laravel 功能運用的部分。
+
+注意事項：
+
+1. 請將設計思路、流程圖、問題解決的過程、資料庫設計想法盡量的記錄下來
+2. 請考慮可能的災難及其可能應對方式
+3. 請考慮未來 A 系統請求數量持續增加，B 系統擴充應對的方式
+4. 請使用 GitHub、Git 管理你的產出（包含文字、流程圖、程式碼等等）
+
+想法 => 功能 : 系統A每次需要對外部服務時, 需要由系統B(ex. ****/api/testb/getList 或 ****/api/testb/getList2 )轉發請求, 回應給系統A 
+	Pro: 當多個API同時觸發時, 可能會造成一個key同時使用, 可能會觸發 API Key Rate Limit 限制 
+	Ans: 使用laravel event與listener, 當觸發API時啟動event,  並且使用隊列事件lsitenter並免他同時觸發(https://docs.laravel-dojo.com/laravel/5.5/events#queued-event-listeners)
+	
