@@ -13,5 +13,9 @@
 
 想法 => 功能 : 系統A每次需要對外部服務時, 需要由系統B(ex. ****/api/testb/getList 或 ****/api/testb/getList2 )轉發請求, 回應給系統A 
 	Pro: 當多個API同時觸發時, 可能會造成一個key同時使用, 可能會觸發 API Key Rate Limit 限制 
-	Ans: 使用laravel event與listener, 當觸發API時啟動event,  並且使用隊列事件lsitenter並免他同時觸發(https://docs.laravel-dojo.com/laravel/5.5/events#queued-event-listeners)
-	
+	Ans: 使用laravel event與listener, 當觸發API時啟動event,  並且使用隊列事件lsitenter並免他同時觸發
+	這方式接近於異步通知 不符合需求
+
+想法2 => 使用laravel Queue將key放入queue中 1秒3次所以將一個key分成3個job 每次取一個使用 使用完畢後release-1秒後可重新使用
+		測試同時從queue pop工作是否會取得重複job -> 不會重複,就算pop之後沒fire也會在1分鐘後 自動釋放job
+		
