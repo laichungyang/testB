@@ -24,3 +24,10 @@
 	php artisan queue:table
 	php artisan migrate
 
+2. 請考慮可能的災難及其可能應對方式
+
+3. 請考慮未來 A 系統請求數量持續增加，B 系統擴充應對的方式
+	- 將新增的key加入資料庫中重新建立queue
+	php artisan queue:init - 清空隊列, 重新根據資料庫建立job
+
+	再麻煩你簡述 Eloquent Builder 與 Query Builder 的差異，以及在呼叫 Eloquent 不存在的方法時，Eloqurnt Builder 透過什麼樣的機制把方法呼叫轉到 Query Builder

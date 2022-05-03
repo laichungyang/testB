@@ -18,7 +18,7 @@ class ActionController extends BaseController
     public function index()
     {
         try {
-            dump(Carbon::now()->format("H:i:s"));
+            // dump(Carbon::now()->format("H:i:s"));
             // 第三方假資料
             $third_domain = 'https://qwerty.third';
             $path = Request::path();
@@ -29,6 +29,7 @@ class ActionController extends BaseController
                 throw new Exception("queue裡沒有job ,無法使用", 1);
             }
             // job 解析
+            // dump($job);
             $payload = $job->payload();
             $command = unserialize($payload['data']['command']);
             $api_key = $command->key;
@@ -38,36 +39,19 @@ class ActionController extends BaseController
             $third_request .= http_build_query(['key' => $api_key, 'num' => $api_num]);
             // 通過curl取得資料塞進data, 此處跳過實作
             $data = [];
-            dump(Carbon::now()->format("H:i:s"));
+            // dump(Carbon::now()->format("H:i:s"));
             return [
                 'status' => 0,
                 'msg' => 'url = ' . $third_request,
                 'data' => $data,
             ];
         } catch (\Throwable $th) {
-            dump(Carbon::now()->format("H:i:s"));
+            // dump(Carbon::now()->format("H:i:s"));
             dd($th);
             return [
                 'status' => 0,
                 'msg' => $th->getMessage()
             ];
         }
-    }
-
-    public function addJob(Request $request)
-    {
-        dump(Carbon::now()->format("H:i:s"));
-        $model = new ApiKey();
-        $apikeys = $model->all();
-        foreach ($apikeys as $apikey) {
-            $api_count = $apikey->count ?? 0;
-            for ($i = 0; $i < $api_count; $i++) {
-                $this->dispatch(new Getkey($apikey->api_key, $i + 1));
-            }
-        }
-
-        dump(Carbon::now()->format("H:i:s"));
-        // dd($a);
-        return 'END';
     }
 }
