@@ -34,7 +34,6 @@ class Getkey implements ShouldQueue, ShouldBeUnique
     public $num;
 
     use Dispatchable, InteractsWithQueue, SerializesModels;
-
     /**
      * Create a new job instance.
      *
@@ -45,7 +44,6 @@ class Getkey implements ShouldQueue, ShouldBeUnique
         $this->key = $key;
         $this->num = $num;
     }
-
     /**
      * Execute the job.
      *
@@ -53,7 +51,6 @@ class Getkey implements ShouldQueue, ShouldBeUnique
      */
     public function handle()
     {
-        // sleep(30);
         // api_key 限制1秒3次 所以將key拆分成3個請求數 當執行完畢後過1秒重新排隊
         $this->release(1);
     }

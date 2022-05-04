@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\Jobs\DatabaseJob;
+use Illuminate\Queue\DatabaseQueue;
 use App\Models\ApiKey;
 use Exception;
 
@@ -24,7 +25,8 @@ class ActionController extends BaseController
             $path = Request::path();
             $third_request = $third_domain . $path;
             // 開始取得queue pop job
-            $job = Queue::connection('database')->pop('choose-api-key');
+            $job = Queue::connection('database')->pop('choose-api-key'); // pop 有用trancation 不會有重複取
+            // dump(Queue::connection('database'));
             if (!$job) {
                 throw new Exception("queue裡沒有job ,無法使用", 1);
             }
@@ -53,5 +55,13 @@ class ActionController extends BaseController
                 'msg' => $th->getMessage()
             ];
         }
+    }
+
+    public function index2()
+    {
+        Queue::looping(function (\Illuminate\Queue\Events\Looping $event) {
+            sleep(30);
+            return true;
+        });
     }
 }

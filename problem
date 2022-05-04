@@ -18,16 +18,15 @@
 		這方式接近於異步通知 不符合需求
 
 	想法2 => 使用laravel Queue將key放入queue中 1秒3次所以將一個key分成3個job 每次取一個使用 使用完畢後release-1秒後可重新使用
-			測試同時從queue pop工作是否會取得重複job -> 不會重複,就算pop之後沒fire也會在1分鐘後 自動釋放job
+			測試同時從queue pop工作是否會取得重複job -> 不會重複,就算pop之後沒fire也會在retry_after後 重排job
 
 	// 設計一個table(api_key) 存放key
 	php artisan queue:table
 	php artisan migrate
 
 2. 請考慮可能的災難及其可能應對方式
-
+	- 目前需要加入新的api-key需要停機重建queue裡的job, 之後可以改成不停機入key
+	- api驗證機制未加
 3. 請考慮未來 A 系統請求數量持續增加，B 系統擴充應對的方式
 	- 將新增的key加入資料庫中重新建立queue
 	php artisan queue:init - 清空隊列, 重新根據資料庫建立job
-
-	再麻煩你簡述 Eloquent Builder 與 Query Builder 的差異，以及在呼叫 Eloquent 不存在的方法時，Eloqurnt Builder 透過什麼樣的機制把方法呼叫轉到 Query Builder

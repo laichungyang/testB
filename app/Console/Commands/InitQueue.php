@@ -42,9 +42,10 @@ class InitQueue extends Command
      */
     public function handle()
     {
+        // 重新刪除q後再重建, 支持之後新增api key
         dump(Carbon::now()->format("H:i:s"));
         $this->call('down');    // laravel暫停
-        $this->call('queue:restart');   // queue運行完畢
+        $this->call('queue:restart');   //  命令會等待隊列中的任務完成後重啟隊列
         $this->call('queue:clear', ['--queue' => 'choose-api-key']);   // 清除queue
         // 重新建立
         $model = new ApiKey();
