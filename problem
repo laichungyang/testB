@@ -30,3 +30,25 @@
 3. 請考慮未來 A 系統請求數量持續增加，B 系統擴充應對的方式
 	- 將新增的key加入資料庫中重新建立queue
 	php artisan queue:init - 清空隊列, 重新根據資料庫建立job
+
+2022 - 05 - 07 問題 :
+1. 若系統加入 Redis，你會如何優化現有流程？
+    laravel的queue改由redis來實現增加效能, 用redis setNX來做成執行鎖
+    """
+     $lock = Redis::setnx('lock-choose-api-key', 1);
+     while ($lock == 0) {
+      try {
+       usleep(10); 
+       $lock = Redis::setnx('lock-choose-api-key', 1);
+      } catch (\Exception $e) {
+       throw new Exception(500, '');
+      }
+     }
+     // 取得queue &job動作
+     Redis::del('lock-choose-api-key');
+    """
+    來做到當有人在對queue執行動作時,所有人皆須等其操作完後, 才能再次存取queue
+2. 請問目前做法是否能夠確保 API Key 精準的在每秒被使用三次？如果不行，可能改善的方向是？
+   原本的方法, pop之後job執行失敗或發生錯誤, 會重新將job放入queue ,會造成沒用到key卻將其重新排隊, 需要額外處理fail job的問題
+3. 針對不停機增減 key 做規劃（用描述的） 
+    不停機增減 key, 在新增1.執行鎖的設計後, 將'檢查DB的key並更新的job' 以下簡稱check-key寫入queue, 當有人pop到此請求check-key時, 運行此job重新建立queue, 建立完成後重新開始pop新job做處理
